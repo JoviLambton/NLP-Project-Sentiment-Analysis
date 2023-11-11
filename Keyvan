@@ -1,0 +1,18 @@
+l_Comment = [] # The text messages inserted in the file
+l_Message = [] # The messages which extracted from the text file
+l_Lable = []   # The Lables which extracted from the text file
+d_Transform_data={}      # The dictionary for transform the Messages and Labales into Pandas Data Frame
+l_Stat=[]      # It is a stat varibale to insert counter of any station in transforming and cleaning of data
+with open("test.txt", 'r', encoding='utf-8') as file:
+        for line in file:
+            x = line.partition("__label__")
+            l_Comment.append(x[2:])
+        pass
+l_Stat.append(len(reviews))
+file.close()
+for review in reviews:
+        l_Lable.append(review[0].split()[0])
+        l_Message.append(' '.join(review[0].split()[1:]))
+d_Transform_data = {"Text":text,"Lable":lable}
+df_Main = pd.DataFrame(d_Transform_data)
+l_Stat.append(len(df_Main))
