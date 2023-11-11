@@ -1,3 +1,13 @@
+#--------------------------Load The Library--------------------------------------------------------#
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import re
+import string
+#------------------------Load Data from file and Transform to Pandas Data Fram---------------------#
+
 l_Comment = [] # The text messages inserted in the file
 l_Message = [] # The messages which extracted from the text file
 l_Lable = []   # The Lables which extracted from the text file
