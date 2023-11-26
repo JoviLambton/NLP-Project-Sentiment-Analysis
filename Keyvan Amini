@@ -1,0 +1,34 @@
+#--------------------------Load The Library--------------------------------------------------------#
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import re
+import string
+#------------------------Load Data from file and Transform to Pandas Data Fram---------------------#
+
+l_Comments = []                                                # The text messages are inserted in the file.
+l_Message = []                                                # The messages extracted from the text file.
+l_Label = []                                                  # The labels extracted from the text file.
+d_Transform_data={}                                           # The dictionary to transform the messages and labels into a Pandas DataFrame.
+l_Stat=[]                                                     # It is a static variable to keep track of the counter for any station in the process of transforming and cleaning the data.
+with open("test.txt", 'r', encoding='utf-8') as file:
+        for line in file:
+            x = line.partition("__label__")                   #Removing the "__label__" from the comments.
+            l_Comments.append(x[2:])                           #Insert the comment into the l_Comment variable.
+        pass
+l_Stat.append(len(l_Comments))                                 #Store the number of comments
+file.close()
+for comment in l_Comment:
+        l_Label.append(comment[0].split()[0])                 #Extract labels from the comments
+        l_Message.append(' '.join(comment[0].split()[1:]))    #Extract messages from the comments.
+d_Transform_data = {"Text":l_Message,"Label":l_Label}               #Load from a list into a dictionary.
+df_Main = pd.DataFrame(d_Transform_data)                     #Transform from a dictionary to a Pandas Data Frame.
+l_Stat.append(len(df_Main))                                  #Store the number of Dataframe rows 
+#----------------------Preprocessing the DataFrame to prepare it for cleaning.----------------------#
+df_Main['Label'] = df_Main['Label'].astype(int)              #Convert the type of the label into an integer.
+df_Main['Label'] = df_Main['Label'].apply(lambda x: 0 if x==1 else 1) #Change all labels to 0 and 1. 
+df_Main.dropna(inplace=True)                                 #Remove any null entries from the DataFrame.     
+l_Stat.append(len(df_Main))                                  #Store the number of not null dataframe rows
+df_Main.to_csv('First_data.txt', index=False, sep='\t')  # Store the DataFrame into a text file with a tab ('\t') as the separator.
