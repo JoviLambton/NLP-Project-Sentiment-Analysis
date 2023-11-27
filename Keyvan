@@ -54,3 +54,13 @@ def f_preprocess_df(data):                                    #Define the functi
 df_copy = df_Main.copy()                                       #Copy to a spare Data Frame to keep the main data frame
 df_copy.loc[:,"Text"] = df_copy["Text"].apply(f_preprocess_df) # Applying the preprocess function to a copy of the data frame
 df_copy.head()
+#-------------------Applying the function to the Data Frame to extract emoji from text into the new column of Data Frame---#
+
+def extract_emojis(text): # Define a function to extract emojis from a text
+    return ''.join(c for c in text if c in emoji.UNICODE_EMOJI)
+
+# Apply the function to the "text" column and insert the result into a new "emojis" column
+df_copy['emojis'] = df_copy['text'].apply(extract_emojis)
+
+print(df_copy)
+
