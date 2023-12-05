@@ -7,6 +7,9 @@ from sklearn.naive_bayes import MultinomialNB
 from nltk.tokenize import word_tokenize, sent_tokenize
 import joblib
 
+import nltk
+nltk.download('punkt')
+
 
 model = joblib.load('clf_nb.pkl')
 vectorizer = joblib.load('tfidf.pkl')
