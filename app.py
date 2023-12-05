@@ -2,8 +2,21 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import altair as alt
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+import joblib
+
+
+model = joblib.load('clf_nb.pkl')
+vectorizer = joblib.load('tfidf.pkl')
+
 
 def process_file(df):
+    text_df = df["Review"]
+    text_vectorized = vectorizer.transform(text_df)
+    df["Sentiment"] = model.predict(text_vectorized)
+    df["Sentiment"] = df["Sentiment"].apply(lambda x: "Negative" if x == 0 else "Positive")
+    # st.dataframe(df)
     return df
 
 def main():
@@ -21,7 +34,7 @@ def main():
         # Read file
         if uploaded_file.type == 'text/csv':
             # Text file
-            df = pd.read_csv(uploaded_file, encoding="utf-8")
+            df = pd.read_csv(uploaded_file, encoding="latin-1")
 
         if st.button("Process Text"):
             df = process_file(df)
@@ -44,10 +57,11 @@ def main():
                 time_df = time_df.reset_index()
                 time_df = pd.pivot_table(time_df, values='Source', index=['Timestamp'], columns='Sentiment', aggfunc="sum").fillna(0)
                 time_df = time_df.reset_index()
+                st.dataframe(time_df)
                 chart_data = pd.DataFrame()
                 chart_data['Timestamp'] = time_df['Timestamp']
                 chart_data['Negative'] = time_df['Negative']
-                chart_data['Neutral'] = time_df['Neutral']
+                # chart_data['Neutral'] = time_df['Neutral']
                 chart_data['Positive'] = time_df['Positive']
                 st.line_chart(chart_data.set_index('Timestamp'))
 
