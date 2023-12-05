@@ -4,20 +4,92 @@ import plotly.express as px
 import altair as alt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
+from nltk.tokenize import word_tokenize, sent_tokenize
 import joblib
 
 
 model = joblib.load('clf_nb.pkl')
 vectorizer = joblib.load('tfidf.pkl')
 
+# Class names
+class_names = ['Negative', 'Positive']
+
+# Function to get the sentiment analysis for a specific text
+def SentimentAnalysis(text):
+    # Vectorization using TF-IDF
+    x_actual_matrix = vectorizer.transform([text])
+    x_actual_tfidf_vector = x_actual_matrix.toarray()
+
+    # Predict the class: Negative/Positive
+    y_actual_pred = model.predict(x_actual_tfidf_vector)
+    
+    # Class probabilities
+    class_prob = model.predict_proba(x_actual_tfidf_vector)
+    
+    sentiment = class_names[y_actual_pred[0]]
+    
+    # Return the sentiment and class probabilities
+    return sentiment, class_prob
+
+# Function to get the sentiment analysis for a specific aspect/keyword
+def AspectBasedSentimentAnalysis(inText, aspect_list):
+    
+    # Sentence tokenization
+    sent_list = sent_tokenize(str(inText))
+    
+    # Initialize dictionaries
+    aspect_class = {}
+    aspect_prob_diff = {}
+    
+    # Loop through all aspects/keywords submitted by user
+    for aspect in aspect_list:
+        # For every aspect, loop through all sentences
+        for sentence in sent_list:
+            
+            # If aspect is in the sentence
+            if aspect in sentence:
+                
+                # Remove the aspect from the sentence
+                aspect_text =  sentence.replace(aspect, "")
+                
+                # Perform sentiment analysis on the sentence without the keyword
+                aspect_sentiment = SentimentAnalysis(aspect_text)
+                
+                # Get the difference between negative and positive class probabilities
+                # If the class probabilities are so close to each other (e.g., negative=0.49, positive=0.51), the difference is not too clear
+                prob_diff = abs(aspect_sentiment[1][0][0] - aspect_sentiment[1][0][1])
+                
+                # print(aspect_text,aspect_sentiment[0],aspect_sentiment[1][0])
+                
+                # This will output only if the probability difference at least 10 PPS
+                if (prob_diff >= 0.10) and (aspect_prob_diff.get(aspect) is not None and prob_diff > aspect_prob_diff.get(aspect) ) or ( (prob_diff >= 0.10) and (aspect_prob_diff.get(aspect) is None) ):
+                    
+                    # Update class dictionary
+                    aspect_class[aspect] = aspect_sentiment[0]
+                    
+                    # Update class probability dictionary
+                    aspect_prob_diff[aspect] = prob_diff
+                                        
+    # Return sentiment analysis for the aspect
+    return aspect_class                    
 
 def process_file(df):
     text_df = df["Review"]
     text_vectorized = vectorizer.transform(text_df)
     df["Sentiment"] = model.predict(text_vectorized)
     df["Sentiment"] = df["Sentiment"].apply(lambda x: "Negative" if x == 0 else "Positive")
-    # st.dataframe(df)
-    return df
+    product_aspects = {}
+    for i, row in df.iterrows():
+        text = row["Review"]
+        aspect_sentiments = AspectBasedSentimentAnalysis(text, row["aspect_list"].split(","))
+        if row["Product"] not in product_aspects:
+            product_aspects[row["Product"]] = [aspect_sentiments]
+        elif aspect_sentiments:
+            product_aspects[row["Product"]].append(aspect_sentiments)
+            
+    # st.dataframe(product_aspects)
+
+    return df, product_aspects
 
 def main():
     st.title("Sentiment Analysis Report")
@@ -37,7 +109,7 @@ def main():
             df = pd.read_csv(uploaded_file, encoding="latin-1")
 
         if st.button("Process Text"):
-            df = process_file(df)
+            df, product_aspects  = process_file(df)
             df['Timestamp'] = pd.to_datetime(df['Timestamp'])
 
             # Streamlit App
@@ -84,9 +156,31 @@ def main():
                 product_sentiment_counts = df[['Product', 'Sentiment', 'Source']].groupby(['Product', 'Sentiment']).count().fillna(0)
                 product_sentiment_counts = product_sentiment_counts.rename(columns={"Source": "Count"})
                 product_sentiment_counts = product_sentiment_counts.reset_index()
-                
+                st.dataframe(product_sentiment_counts)
                 bar_chart = alt.Chart(product_sentiment_counts).mark_bar().encode(
                         x="Product",
+                        y="Count",
+                        color="Sentiment",
+                    )
+                st.altair_chart(bar_chart, use_container_width=True)
+
+                st.table(product_sentiment_counts)
+
+            st.header("Aspects Across Products")
+           
+            for product, aspects in product_aspects.items():
+                st.subheader(product+":")
+                product_aspects_list = []
+                for aspect in aspects:
+                    aspect_name = list(aspect.keys())[0]
+                    sentiment = list(aspect.values())[0]
+                    product_aspects_list.append([aspect_name, sentiment])
+                tmp_df = pd.DataFrame(product_aspects_list, columns=["Aspect", "Sentiment"])
+                tmp_df = tmp_df.groupby(['Aspect', 'Sentiment']).size().reset_index(name='Count')
+                # st.dataframe(tmp_df)
+
+                bar_chart = alt.Chart(tmp_df).mark_bar().encode(
+                        x="Aspect",
                         y="Count",
                         color="Sentiment",
                     )
