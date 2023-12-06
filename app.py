@@ -17,6 +17,7 @@ nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('wordnet') 
+nltk.download('omw-1.4')
 
 # Load spacy model
 # nlp = spacy.load("en_core_web_md")
