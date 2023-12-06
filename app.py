@@ -208,7 +208,7 @@ def main():
     st.title("Sentiment Analysis Report")
 
     # File Upload
-    uploaded_file = st.file_uploader("Choose a file", type=["txt", "csv"])
+    uploaded_file = st.file_uploader("Choose a file. Required fields: Review, Timestamp, Source, Product, Aspect_List", type=["txt", "csv"])
     
     # Multi-select for Products
     # selected_products = st.multiselect("Select Products", ["Timestamp", "Source", "Product", "Topic"])
