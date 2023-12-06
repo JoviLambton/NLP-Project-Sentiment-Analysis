@@ -17,7 +17,7 @@ nltk.download('punkt')
 
 
 # Load spacy model
-nlp = spacy.load("en_core_web_md")
+# nlp = spacy.load("en_core_web_md")
 
 stop_words = set([word for word in stopwords.words('english') if word not in ['not','no']])
 lemmatizer = WordNetLemmatizer()
@@ -76,7 +76,7 @@ def AspectBasedSentimentAnalysis(inText, aspect_list):
                 
                 # Pre-process text
                 aspect_text = preprocess_text_1(aspect_text)
-                aspect_text = remove_named_entities(aspect_text)
+                # aspect_text = remove_named_entities(aspect_text)
                 aspect_text = preprocess_text_2(aspect_text)
                 aspect_text = remove_pos(aspect_text)
                 
@@ -177,7 +177,7 @@ def process_file(df):
     
     # Pre-process text
     text_df = text_df.apply(preprocess_text_1)
-    text_df = text_df.apply(remove_named_entities)
+    # text_df = text_df.apply(remove_named_entities)
     text_df = text_df.apply(preprocess_text_2)
     text_df = text_df.apply(remove_pos)
     print('----',type(text_df),text_df)
