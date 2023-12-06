@@ -5,7 +5,7 @@ import altair as alt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 import joblib
-import spacy
+# import spacy
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import re
@@ -51,7 +51,11 @@ def SentimentAnalysis(text):
     # Class probabilities
     class_prob = model.predict_proba(x_actual_tfidf_vector)
     
-    sentiment = class_names[y_actual_pred[0]]
+    # sentiment = class_names[y_actual_pred[0]]
+    if y_actual_pred[0] == 0:
+        sentiment = 'Negative'
+    else:
+        sentiment = 'Positive'
     
     # Return the sentiment and class probabilities
     return sentiment, class_prob
@@ -93,13 +97,13 @@ def AspectBasedSentimentAnalysis(inText, aspect_list):
                 # print(aspect_text,aspect_sentiment[0],aspect_sentiment[1][0])
                 
                 # This will output only if the probability difference at least 10 PPS
-                if (prob_diff >= 0.10) and (aspect_prob_diff.get(aspect) is not None and prob_diff > aspect_prob_diff.get(aspect) ) or ( (prob_diff >= 0.10) and (aspect_prob_diff.get(aspect) is None) ):
+                # if (prob_diff >= 0.10) and (aspect_prob_diff.get(aspect) is not None and prob_diff > aspect_prob_diff.get(aspect) ) or ( (prob_diff >= 0.10) and (aspect_prob_diff.get(aspect) is None) ):
                     
-                    # Update class dictionary
-                    aspect_class[aspect] = aspect_sentiment[0]
+                # Update class dictionary
+                aspect_class[aspect] = aspect_sentiment[0]
                     
-                    # Update class probability dictionary
-                    aspect_prob_diff[aspect] = prob_diff
+                # Update class probability dictionary
+                aspect_prob_diff[aspect] = prob_diff
                                         
     # Return sentiment analysis for the aspect
     return aspect_class                    
@@ -207,7 +211,7 @@ def main():
     uploaded_file = st.file_uploader("Choose a file", type=["txt", "csv"])
     
     # Multi-select for Products
-    selected_products = st.multiselect("Select Products", ["Timestamp", "Source", "Product", "Topic"])
+    # selected_products = st.multiselect("Select Products", ["Timestamp", "Source", "Product", "Topic"])
 
     if uploaded_file is not None:
         # st.text("Selected: "+ str(selected_products))
