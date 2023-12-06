@@ -180,7 +180,6 @@ def process_file(df):
     # text_df = text_df.apply(remove_named_entities)
     text_df = text_df.apply(preprocess_text_2)
     text_df = text_df.apply(remove_pos)
-    print('----',type(text_df),text_df)
 
     text_vectorized = vectorizer.transform(text_df)
     df["Sentiment"] = model.predict(text_vectorized)
