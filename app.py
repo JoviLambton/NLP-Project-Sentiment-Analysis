@@ -15,6 +15,8 @@ import nltk
 import nltk
 nltk.download('punkt')
 nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+ 
 
 # Load spacy model
 # nlp = spacy.load("en_core_web_md")
