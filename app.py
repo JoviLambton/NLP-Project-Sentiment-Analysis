@@ -5,7 +5,7 @@ import altair as alt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 import joblib
-import spacy
+# import spacy
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import re
