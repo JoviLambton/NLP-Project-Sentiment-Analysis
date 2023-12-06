@@ -31,7 +31,7 @@ pos_list = ['PRP',  # PRP personal pronoun I, he, she
             'IN'    # IN preposition/subordinating conjunction 
             ]
     
-model = joblib.load('model_naive_bayes.pkl')
+model = joblib.load('clf_nb.pkl')
 vectorizer = joblib.load('tfidf.pkl')
 
 
