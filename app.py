@@ -280,6 +280,7 @@ def main():
             for product, aspects in product_aspects.items():
                 st.subheader(product+":")
                 product_aspects_list = []
+                st.subheader(aspects)
                 for aspect in aspects:
                     aspect_name = list(aspect.keys())[0]
                     sentiment = list(aspect.values())[0]
